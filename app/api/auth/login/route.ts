@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await (prisma as any).user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { username },
     });
 
@@ -39,19 +40,16 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        driverId: user.driverId,
-        driverName: user.driverName,
-      },
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      driverId: user.driverId,
+      driverName: user.driverName,
     });
-  } catch (error: any) {
-    console.error("LOGIN ERROR:", error);
+  } catch (error) {
+    console.error("Login error:", error);
     return NextResponse.json(
-      { error: error?.message || "Login failed" },
+      { error: "Login failed" },
       { status: 500 }
     );
   }
