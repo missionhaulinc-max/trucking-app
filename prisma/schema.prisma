@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Driver {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String?
+  address    String?
+  ssnLast4   String?
+  truck      String?
+  driverType String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  loads      Load[]
+}
+
+model Vehicle {
+  id             String   @id @default(cuid())
+  company        String
+  make           String
+  model          String
+  kind           String
+  vinNumber      String
+  unitNumber     String
+  licensePlate   String
+  assignedDriver String?
+  ownershipType  String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Load {
+  id               String   @id @default(cuid())
+  loadNumber       String
+  broker           String
+  pickupLocation   String
+  deliveryLocation String
+  pickupDate       DateTime
+  deliveryDate     DateTime
+  status           String
+  rate             Float
+  truck            String?
+  totalMiles       Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  driverId         String?
+  driver           Driver?  @relation(fields: [driverId], references: [id])
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  category  String
+  amount    Float
+  date      DateTime
+  driver    String?
+  truck     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Settlement {
+  id            String   @id @default(cuid())
+  driverName    String
+  driverId      String?
+  driverType    String?
+  paystubId     String?
+  payDate       DateTime
+  weekStart     DateTime
+  weekEnd       DateTime
+  grossAmount   Float?
+  totalMiles    Float?
+  totalExpense  Float?
+  dispatchFee   Float?
+  netAmount     Float?
+  loadDetails   String?
+  expenseDetails String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model User {
+  id         String   @id @default(cuid())
+  username   String   @unique
+  password   String
+  role       String
+  driverId   String?
+  driverName String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
