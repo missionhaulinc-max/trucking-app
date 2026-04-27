@@ -5,34 +5,37 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// GET ALL DRIVERS
+export async function GET() {
   try {
-    const { id } = await params;
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "Expense ID is required" },
-        { status: 400 }
-      );
-    }
-
-    await prisma.expense.delete({
-      where: { id },
+    const drivers = await prisma.driver.findMany({
+      orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Expense deleted successfully",
-    });
+    return NextResponse.json(drivers);
   } catch (error) {
-    console.error("DELETE EXPENSE ERROR:", error);
+    console.error("GET DRIVERS ERROR:", error);
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
+  }
+}
 
-    return NextResponse.json(
-      { error: "Failed to delete expense" },
-      { status: 500 }
-    );
+// CREATE DRIVER
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+
+    const driver = await prisma.driver.create({
+      data: {
+        name: body.name,
+        phone: body.phone || null,
+        address: body.address || null,
+        driverType: body.driverType || "company",
+      },
+    });
+
+    return NextResponse.json(driver);
+  } catch (error) {
+    console.error("CREATE DRIVER ERROR:", error);
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
 }
