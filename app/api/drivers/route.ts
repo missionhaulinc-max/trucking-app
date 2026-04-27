@@ -1,58 +1,37 @@
-import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
-};
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const runtime = "nodejs";
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
-
-export async function GET() {
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const drivers = await prisma.driver.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    const { id } = await params;
 
-    return Response.json(drivers);
-  } catch (error: any) {
-    console.error("GET DRIVERS ERROR:", error);
-    return Response.json(
-      { error: error?.message || "Failed to fetch drivers" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-
-    if (!body.name || !body.driverType) {
-      return Response.json(
-        { error: "Driver name and driver type are required" },
+    if (!id) {
+      return NextResponse.json(
+        { error: "Expense ID is required" },
         { status: 400 }
       );
     }
 
-    const newDriver = await prisma.driver.create({
-      data: {
-        name: String(body.name),
-        phone: body.phone ? String(body.phone) : "",
-        address: body.address ? String(body.address) : "",
-        ssnLast4: body.ssnLast4 ? String(body.ssnLast4) : "",
-        truck: body.truck ? String(body.truck) : "",
-        driverType: String(body.driverType),
-      },
+    await prisma.expense.delete({
+      where: { id },
     });
 
-    return Response.json(newDriver);
-  } catch (error: any) {
-    console.error("POST DRIVER ERROR:", error);
-    return Response.json(
-      { error: error?.message || "Failed to create driver" },
+    return NextResponse.json({
+      success: true,
+      message: "Expense deleted successfully",
+    });
+  } catch (error) {
+    console.error("DELETE EXPENSE ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Failed to delete expense" },
       { status: 500 }
     );
   }
