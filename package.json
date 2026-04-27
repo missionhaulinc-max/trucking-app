@@ -2,12 +2,15 @@
   "name": "trucking-app",
   "version": "0.1.0",
   "private": true,
+
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
   },
+
   "dependencies": {
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^5.22.0",
@@ -20,6 +23,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
+
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
     "@types/bcryptjs": "^2.4.6",
