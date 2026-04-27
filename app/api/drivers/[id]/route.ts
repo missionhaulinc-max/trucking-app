@@ -7,28 +7,18 @@ export const runtime = "nodejs";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
-
-    if (!id) {
-      return NextResponse.json(
-        { error: "Driver ID is required" },
-        { status: 400 }
-      );
-    }
+    const { id } = await params;
 
     await prisma.driver.delete({
       where: { id },
     });
 
-    return NextResponse.json({
-      success: true,
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE DRIVER ERROR:", error);
-
     return NextResponse.json(
       { error: "Failed to delete driver" },
       { status: 500 }
