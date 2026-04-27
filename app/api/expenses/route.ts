@@ -26,11 +26,10 @@ export async function POST(req: Request) {
 
 const expense = await prisma.expense.create({
   data: {
-    category: Number(body.category || 0),
+    category: String(body.category || "Other"),
     amount: Number(body.amount || 0),
   },
 });
-
     return NextResponse.json(expense);
   } catch (error) {
     console.error(error);
