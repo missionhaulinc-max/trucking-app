@@ -7,10 +7,10 @@ export const runtime = "nodejs";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json(
@@ -25,7 +25,6 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: "Driver deleted successfully",
     });
   } catch (error) {
     console.error("DELETE DRIVER ERROR:", error);
